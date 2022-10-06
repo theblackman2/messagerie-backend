@@ -1,8 +1,10 @@
-const express = require("express");
-require("dotenv").config();
+import express from "express";
+import "dotenv/config";
 const PORT = process.env.PORT || 5000;
-const cors = require("cors");
-const mongoose = require("./services/mongoose");
+import cors from "cors";
+import { encrypt } from "./services/bcrypt.js";
+
+console.log(encrypt("test"));
 
 const app = express();
 
