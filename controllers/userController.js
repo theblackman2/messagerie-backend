@@ -50,9 +50,9 @@ export const login = async (req, res) => {
   const foundUser = await User.findOne({ pseudo: pseudo });
 
   if (!foundUser)
-    return res.status(404).json({
+    return res.json({
       type: "Error",
-      message: "The pseudo dosn't match any record",
+      message: "Le pseudo que vous avez entré est incorrect",
     });
 
   const cryptedPassword = foundUser.password;
@@ -60,7 +60,7 @@ export const login = async (req, res) => {
   if (!match)
     return res.json({
       type: "Error",
-      message: "The password is wrong",
+      message: "Le mot de passe entré est incorrecte",
     });
   res.send("User connected");
 };
