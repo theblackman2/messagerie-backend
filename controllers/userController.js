@@ -1,5 +1,8 @@
 import User from "../models/user.js";
 import { compare, encrypt } from "../services/bcrypt.js";
+import jwt from "jsonwebtoken";
+
+const secret = process.env.JWT_SECRET;
 
 export const getAll = async (req, res) => {
   const users = await User.find();
@@ -19,7 +22,8 @@ export const register = async (req, res) => {
   if (existsUser)
     return res.json({
       type: "Error",
-      message: "This pseudo is already used",
+      message:
+        "Le pseudo que vous avez entré est déjà utilisé, si vous êtes la même personne connectez-vous",
     });
 
   const cryptedPassword = await encrypt(password);
@@ -27,12 +31,18 @@ export const register = async (req, res) => {
     pseudo,
     password: cryptedPassword,
   });
-  if (user)
-    res.status(201).json({
+  if (user) {
+    const payload = {
+      id: user._id,
+      pseudo: user.pseudo,
+    };
+    const token = jwt.sign(payload, secret, { expiresIn: "1d" });
+    res.status(201).send({
       type: "success",
       message: "The user is created",
+      token: `Bearer ${token}`,
     });
-  else
+  } else
     res.status(500).json({
       type: "Error",
       message: "Something went wrong",
@@ -62,5 +72,22 @@ export const login = async (req, res) => {
       type: "Error",
       message: "Le mot de passe entré est incorrecte",
     });
-  res.send("User connected");
+
+  const payload = {
+    pseudo: foundUser.pseudo,
+    id: foundUser.id,
+  };
+
+  const token = jwt.sign(payload, secret, { expiresIn: "1d" });
+
+  res.send({
+    type: "Success",
+    message: "User loged in",
+    user: {
+      id: foundUser._id,
+      pseudo: foundUser.pseudo,
+      active: foundUser.active,
+      token: `Bearer ${token}`,
+    },
+  });
 };

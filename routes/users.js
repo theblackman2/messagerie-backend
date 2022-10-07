@@ -1,7 +1,12 @@
 import { Router } from "express";
-import { getAll, register } from "../controllers/userController.js";
+import { login, register } from "../controllers/userController.js";
+import User from "../models/user.js";
 
 const userRouter = Router();
-userRouter.get("/", getAll);
+
+userRouter.get("/", (req, res) => {
+  const users = User.find();
+  res.send(users);
+});
 
 export default userRouter;
