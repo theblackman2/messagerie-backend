@@ -6,7 +6,10 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
   pseudo: String,
   password: String,
-  imageUrl: String,
+  imageUrl: {
+    type: String,
+    default: "",
+  },
   active: { type: Boolean, default: true },
 });
 

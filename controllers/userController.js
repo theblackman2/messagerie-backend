@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const secret = process.env.JWT_SECRET;
 
 export const getAll = async (req, res) => {
-  const users = await User.find();
+  const users = await User.find({ active: true }, { pseudo: 1, imageUrl: 1 });
   res.send(users);
 };
 
@@ -40,7 +40,12 @@ export const register = async (req, res) => {
     res.status(201).send({
       type: "success",
       message: "The user is created",
-      token: `Bearer ${token}`,
+      user: {
+        id: user._id,
+        pseudo: user.pseudo,
+        active: user.active,
+        token: `Bearer ${token}`,
+      },
     });
   } else
     res.status(500).json({
