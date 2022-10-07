@@ -4,8 +4,8 @@ import User from "../models/user.js";
 
 const userRouter = Router();
 
-userRouter.get("/", (req, res) => {
-  const users = User.find();
+userRouter.get("/", async (req, res) => {
+  const users = await User.find();
   res.send(users);
 });
 

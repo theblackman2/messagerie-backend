@@ -5,6 +5,7 @@ import cors from "cors";
 import userRouter from "./routes/users.js";
 import passport from "passport";
 import authRouter from "./routes/auth.js";
+import authMiddleware from "./middlewares/auth/auth.js";
 
 const app = express();
 
@@ -13,17 +14,16 @@ app.use(passport.initialize());
 
 app.use(cors());
 
-import "./middlewares/auth/auth.js";
-
 app.get("/", (request, response) => {
   response.send("Hello from the backend");
 });
 
-app.use("/users", userRouter);
-
 app.use("/auth", authRouter);
 
-app.get("/protected", passport.authenticate("jwt", { session: false }));
+// This part requires an authentification
+app.use(authMiddleware.authenticate("jwt", { session: false }));
+
+app.use("/users", userRouter);
 
 app.all("*", (request, response) => {
   response.sendStatus(404);
