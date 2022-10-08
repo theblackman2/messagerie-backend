@@ -50,7 +50,7 @@ export const findOrCreate = async (req, res) => {
     });
 
   const existsConversation = await Conversation.findOne({
-    participants: participants,
+    participants: { $all: participants },
   });
 
   if (existsConversation) return res.send(existsConversation);
