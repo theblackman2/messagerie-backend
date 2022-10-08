@@ -9,8 +9,6 @@ const conversationsRouter = Router();
 
 conversationsRouter.get("/", getAll);
 
-conversationsRouter.get("/:id", getOne);
-
 conversationsRouter.post("/", findOrCreate);
 
 export default conversationsRouter;
