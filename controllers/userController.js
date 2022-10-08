@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const secret = process.env.JWT_SECRET;
 
 export const getAll = async (req, res) => {
-  const users = await User.find({ active: true }, { pseudo: 1, imageUrl: 1 });
+  const users = await User.find({ active: true }, "pseudo imageUrl");
   res.send(users);
 };
 

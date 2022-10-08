@@ -6,6 +6,7 @@ import userRouter from "./routes/users.js";
 import passport from "passport";
 import authRouter from "./routes/auth.js";
 import authMiddleware from "./middlewares/auth/auth.js";
+import conversationsRouter from "./routes/conversations.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/auth", authRouter);
 app.use(authMiddleware.authenticate("jwt", { session: false }));
 
 app.use("/users", userRouter);
+app.use("/conversations", conversationsRouter);
 
 app.all("*", (request, response) => {
   response.sendStatus(404);
