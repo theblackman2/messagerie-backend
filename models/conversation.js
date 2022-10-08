@@ -3,7 +3,7 @@ import db from "./../services/mongoose.js";
 
 const { Schema } = mongoose;
 
-const messageSchema = new Schema(
+export const messageSchema = new Schema(
   {
     sender: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,6 +22,8 @@ const conversationSchema = new Schema(
   },
   { timestamps: true }
 );
+
+export const MessageModel = db.model("message", messageSchema);
 
 const Conversation = db.model("Conversation", conversationSchema);
 
