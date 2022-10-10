@@ -121,3 +121,18 @@ export const addMessage = async (req, res) => {
     }
   );
 };
+
+export const getRecents = async (req, res) => {
+  const { id } = req.body;
+  if (!id || !ObjectId.isValid(id))
+    return res.status(400).send({
+      type: "Error",
+      message: "The request body must contain a valid id",
+    });
+
+  const recents = await Conversation.find({
+    participants: { $in: id },
+  }).sort({ updatedAt: "desc" });
+
+  res.send(recents);
+};
