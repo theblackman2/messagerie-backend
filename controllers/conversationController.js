@@ -102,12 +102,22 @@ export const addMessage = async (req, res) => {
           type: "Error",
           message: "Something went wrong",
         });
-      else
-        res.status(201).send({
-          type: "Success",
-          message: "Message created",
-          data: success,
+      else {
+        MessageModel.deleteOne({ _id: createdMessage._id }, (error, done) => {
+          if (error)
+            res.status(400).send({
+              type: "Error",
+              message: "Sothing went wrong",
+            });
+          else {
+            res.status(201).send({
+              type: "Success",
+              message: "Message created",
+              data: success,
+            });
+          }
         });
+      }
     }
   );
 };
