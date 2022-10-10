@@ -123,7 +123,7 @@ export const addMessage = async (req, res) => {
 };
 
 export const getRecents = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.query;
   if (!id || !ObjectId.isValid(id))
     return res.status(400).send({
       type: "Error",
