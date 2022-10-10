@@ -127,7 +127,7 @@ export const getRecents = async (req, res) => {
   if (!id || !ObjectId.isValid(id))
     return res.status(400).send({
       type: "Error",
-      message: "The request body must contain a valid id",
+      message: "The request querries must contain a valid id",
     });
 
   const recents = await Conversation.find({

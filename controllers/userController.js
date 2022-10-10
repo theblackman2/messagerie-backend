@@ -1,12 +1,33 @@
 import User from "../models/user.js";
 import { compare, encrypt } from "../services/bcrypt.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+
+const ObjectId = mongoose.Types.ObjectId;
 
 const secret = process.env.JWT_SECRET;
 
 export const getAll = async (req, res) => {
   const users = await User.find({ active: true }, "pseudo imageUrl");
   res.send(users);
+};
+
+export const getOne = async (req, res) => {
+  const id = req.params.id;
+  if (!id || !ObjectId.isValid(id))
+    return res.status(400).send({
+      type: "Error",
+      message: "The request body must contain a valid id",
+    });
+
+  const user = await User.findOne({ _id: id, active: true }, { password: 0 });
+  if (!user)
+    return res.send({
+      type: "Error",
+      message: "The user doesn't exists",
+    });
+
+  res.send(user);
 };
 
 export const register = async (req, res) => {
