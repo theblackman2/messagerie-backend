@@ -132,7 +132,9 @@ export const getRecents = async (req, res) => {
 
   const recents = await Conversation.find({
     participants: { $in: id },
-  }).sort({ updatedAt: "desc" });
+  })
+    .sort({ updatedAt: "desc" })
+    .populate("participants");
 
   res.send(recents);
 };
