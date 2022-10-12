@@ -12,7 +12,7 @@ conversationsRouter.get("/", getAll);
 
 conversationsRouter.post("/", findOrCreate);
 
-conversationsRouter.post("/message", addMessage);
+conversationsRouter.put("/message", addMessage);
 
 conversationsRouter.get("/recents", getRecents);
 
