@@ -7,6 +7,8 @@ import passport from "passport";
 import authRouter from "./routes/auth.js";
 import authMiddleware from "./middlewares/auth/auth.js";
 import conversationsRouter from "./routes/conversations.js";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 const app = express();
 
@@ -31,6 +33,33 @@ app.all("*", (request, response) => {
   response.sendStatus(404);
 });
 
-app.listen(PORT, () => {
-  console.log(`The server is running on http://localhost:${PORT}`);
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  },
+});
+
+// store all online users
+global.onlineUsers = {};
+
+io.on("connection", (socket) => {
+  global.chatSocket = socket;
+
+  socket.on("add-user", (userId) => {
+    onlineUsers[userId] = socket.id;
+  });
+
+  socket.on("send-msg", (data) => {
+    console.log(onlineUsers);
+    const sendUserSocket = onlineUsers[data.to];
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("receive", data.message);
+    }
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`Server started on http://localhost:${PORT}`);
 });

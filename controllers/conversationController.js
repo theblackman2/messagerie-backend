@@ -113,7 +113,7 @@ export const addMessage = async (req, res) => {
             res.status(201).send({
               type: "Success",
               message: "Message created",
-              data: success,
+              data: createdMessage,
             });
           }
         });
