@@ -1,4 +1,5 @@
-import Conversation, { MessageModel } from "../models/conversation.js";
+import Conversation from "../models/conversation.js";
+import Message from "../models/message.js";
 import mongoose from "mongoose";
 
 const ObjectId = mongoose.Types.ObjectId;
@@ -12,7 +13,9 @@ const validParticipants = (participants) =>
   });
 
 export const getAll = async (req, res) => {
-  const conversations = await Conversation.find();
+  const conversations = await Conversation.find()
+    .populate("participants")
+    .populate("messages");
   if (!conversations)
     return res.send({
       type: "Error",
@@ -51,7 +54,9 @@ export const findOrCreate = async (req, res) => {
 
   const existsConversation = await Conversation.findOne({
     participants: { $all: participants },
-  });
+  })
+    .populate("participants")
+    .populate("messages");
 
   if (existsConversation) return res.send(existsConversation);
 
@@ -85,7 +90,7 @@ export const addMessage = async (req, res) => {
       message: "The sender id is not valid",
     });
 
-  const createdMessage = await MessageModel.create({
+  const createdMessage = await Message.create({
     sender: senderId,
     text: message.text ? message.text : "",
     imageUrl: message.imageUrl ? message.imageUrl : "",
@@ -94,7 +99,7 @@ export const addMessage = async (req, res) => {
   Conversation.updateOne(
     { _id: id },
     {
-      $push: { messages: createdMessage },
+      $push: { messages: createdMessage._id },
     },
     (error, success) => {
       if (error)
@@ -103,19 +108,10 @@ export const addMessage = async (req, res) => {
           message: "Something went wrong",
         });
       else {
-        MessageModel.deleteOne({ _id: createdMessage._id }, (error, done) => {
-          if (error)
-            res.status(400).send({
-              type: "Error",
-              message: "Sothing went wrong",
-            });
-          else {
-            res.status(201).send({
-              type: "Success",
-              message: "Message created",
-              data: createdMessage,
-            });
-          }
+        res.status(201).send({
+          type: "Success",
+          message: "Message created",
+          data: createdMessage,
         });
       }
     }
@@ -134,7 +130,8 @@ export const getRecents = async (req, res) => {
     participants: { $in: id },
   })
     .sort({ updatedAt: "desc" })
-    .populate("participants");
+    .populate("participants")
+    .populate("messages");
 
   res.send(recents);
 };
