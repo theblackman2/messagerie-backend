@@ -10,6 +10,7 @@ import conversationsRouter from "./routes/conversations.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { log } from "console";
+import Conversation from "./models/conversation.js";
 
 const app = express();
 
@@ -52,10 +53,18 @@ io.on("connection", (socket) => {
     onlineUsers[userId] = socket.id;
   });
 
-  socket.on("send-msg", (data) => {
+  socket.on("send-msg", async (data) => {
     const sendUserSocket = onlineUsers[data.to];
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("receive", data.message);
+      const conversation = await Conversation.findOne({
+        _id: data.conversation,
+      })
+        .populate("participants")
+        .populate("messages");
+      socket.to(sendUserSocket).emit("receive", {
+        conversation: conversation,
+        message: data.message,
+      });
     }
   });
 });
