@@ -9,6 +9,7 @@ import authMiddleware from "./middlewares/auth/auth.js";
 import conversationsRouter from "./routes/conversations.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { log } from "console";
 
 const app = express();
 
