@@ -17,7 +17,11 @@ const app = express();
 app.use(express.json());
 app.use(passport.initialize());
 
-app.use(cors());
+const corsOptions = {
+  origin: [process.env.FRONTEND_URL],
+};
+
+app.use(cors(corsOptions));
 
 app.get("/", (request, response) => {
   response.send("Hello from the backend");
