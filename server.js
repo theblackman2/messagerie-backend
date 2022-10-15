@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(passport.initialize());
 
 const corsOptions = {
-  origin: [process.env.FRONTEND_URL],
+  // origin: [process.env.FRONTEND_URL],
 };
 
 app.use(cors(corsOptions));
