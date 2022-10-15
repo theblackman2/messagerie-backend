@@ -52,10 +52,12 @@ global.onlineUsers = {};
 io.on("connection", (socket) => {
   global.chatSocket = socket;
 
+  // store a user among online users when connected
   socket.on("add-user", (userId) => {
     onlineUsers[userId] = socket.id;
   });
 
+  // send a message to a specifique user
   socket.on("send-msg", async (data) => {
     const sendUserSocket = onlineUsers[data.to];
     if (sendUserSocket) {
@@ -64,6 +66,11 @@ io.on("connection", (socket) => {
         message: data.message,
       });
     }
+  });
+
+  // send a message when a user create account
+  socket.on("first-time", (data) => {
+    socket.broadcast.emit("user-joined", data);
   });
 });
 
