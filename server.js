@@ -56,13 +56,8 @@ io.on("connection", (socket) => {
   socket.on("send-msg", async (data) => {
     const sendUserSocket = onlineUsers[data.to];
     if (sendUserSocket) {
-      const conversation = await Conversation.findOne({
-        _id: data.conversation,
-      })
-        .populate("participants")
-        .populate("messages");
       socket.to(sendUserSocket).emit("receive", {
-        conversation: conversation,
+        conversationId: data.conversation,
         message: data.message,
       });
     }
