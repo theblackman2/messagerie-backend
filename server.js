@@ -62,6 +62,7 @@ io.on("connection", (socket) => {
     const sendUserSocket = onlineUsers[data.to];
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("receive", {
+        sender: data.sender,
         conversationId: data.conversation,
         message: data.message,
       });
