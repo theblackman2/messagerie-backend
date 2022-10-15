@@ -21,7 +21,7 @@ const corsOptions = {
   // origin: [process.env.FRONTEND_URL],
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.get("/", (request, response) => {
   response.send("Hello from the backend");
