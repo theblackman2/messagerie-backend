@@ -1,6 +1,7 @@
 import Conversation from "../models/conversation.js";
 import Message from "../models/message.js";
 import mongoose from "mongoose";
+import cloudinary from "../services/cloudinary.js";
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -70,6 +71,7 @@ export const findOrCreate = async (req, res) => {
 
 export const addMessage = async (req, res) => {
   const { id, message } = req.body;
+
   if (!id || !message || !ObjectId.isValid(id))
     return res.status(400).send({
       type: "Error",
@@ -90,10 +92,22 @@ export const addMessage = async (req, res) => {
       message: "The sender id is not valid",
     });
 
+  let uploadResult = null;
+  if (message.imageUrl) {
+    try {
+      const response = await cloudinary.uploader.upload(message.imageUrl, {
+        upload_preset: "dev_setups",
+      });
+      uploadResult = response.public_id;
+    } catch (err) {
+      return res.send(err);
+    }
+  }
+
   const createdMessage = await Message.create({
     sender: senderId,
     text: message.text ? message.text : "",
-    imageUrl: message.imageUrl ? message.imageUrl : "",
+    imageUrl: uploadResult ? uploadResult : "",
   });
 
   Conversation.updateOne(

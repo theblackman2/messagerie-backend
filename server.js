@@ -9,17 +9,12 @@ import authMiddleware from "./middlewares/auth/auth.js";
 import conversationsRouter from "./routes/conversations.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { log } from "console";
-import Conversation from "./models/conversation.js";
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 app.use(passport.initialize());
-
-const corsOptions = {
-  // origin: [process.env.FRONTEND_URL],
-};
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(cors());
 
