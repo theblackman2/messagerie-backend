@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import { compare, encrypt } from "../services/bcrypt.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import cloudinary from "../services/cloudinary.js";
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -44,7 +45,7 @@ export const register = async (req, res) => {
     return res.json({
       type: "Error",
       message:
-        "Le pseudo que vous avez entré est déjà utilisé, si vous êtes la même personne connectez-vous",
+        "Il y a une erreur avec le pseudo que vous voulez utiliser, si l'erreur persiste, créez-en un autre",
     });
 
   const cryptedPassword = await encrypt(password);
@@ -66,6 +67,7 @@ export const register = async (req, res) => {
         pseudo: user.pseudo,
         active: user.active,
         token: `Bearer ${token}`,
+        imageUrl: user.imageUrl,
       },
     });
   } else
@@ -88,7 +90,8 @@ export const login = async (req, res) => {
   if (!foundUser)
     return res.json({
       type: "Error",
-      message: "Le pseudo que vous avez entré est incorrect",
+      message:
+        "Les identifiants que vous avez entré sont incorrectes, veillez réessayer",
     });
 
   const cryptedPassword = foundUser.password;
@@ -96,7 +99,8 @@ export const login = async (req, res) => {
   if (!match)
     return res.json({
       type: "Error",
-      message: "Le mot de passe entré est incorrecte",
+      message:
+        "Les identifiants que vous avez entré sont incorrectes, veillez réessayer",
     });
 
   const payload = {
@@ -114,6 +118,36 @@ export const login = async (req, res) => {
       pseudo: foundUser.pseudo,
       active: foundUser.active,
       token: `Bearer ${token}`,
+      imageUrl: foundUser.imageUrl,
+    },
+  });
+};
+
+export const updateProfileImage = async (req, res) => {
+  const { userId, encodedFile } = req.body;
+  if (!userId || !encodedFile) return res.sendStatus(400);
+  const user = User.findOne({ _id: userId });
+  if (!user) return res.sendStatus(401);
+  let imageUrl = null;
+  try {
+    const response = await cloudinary.uploader.upload(encodedFile, {
+      upload_preset: process.env.CLOUD_PRESET,
+    });
+    imageUrl = response.public_id;
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  const updated = await User.updateOne(
+    { _id: userId },
+    { $set: { imageUrl: imageUrl } }
+  );
+  if (!updated) return res.sendStatus(500);
+  return res.json({
+    type: "success",
+    data: {
+      response: updated,
+      imageUrl: imageUrl,
     },
   });
 };
