@@ -96,7 +96,7 @@ export const addMessage = async (req, res) => {
   if (message.imageUrl) {
     try {
       const response = await cloudinary.uploader.upload(message.imageUrl, {
-        upload_preset: "dev_setups",
+        upload_preset: process.env.CLOUD_PRESET,
       });
       uploadResult = response.public_id;
     } catch (err) {
